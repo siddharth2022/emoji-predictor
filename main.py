@@ -56,18 +56,33 @@ def label_to_emoji(label):
     Converts a label (int or string) into the corresponding emoji code (string) ready to be printed
     """
     return em.emojize(emoji_dictionary[str(label)], use_aliases=True)
-with open("variables/maxLen", "rb") as f:
-    maxLen = pickle.load(f)
-    
-with open("variables/word_to_index", "rb") as f:
-    word_to_index = pickle.load(f)
-x_test = np.array([sys.argv[1]])
-X_test_indices = sentences_to_indices(x_test, word_to_index, maxLen)
-out = np.argmax(model1.predict(X_test_indices))
-if(sys.argv[1] == "i love u"):
-    print("0")
-elif(sys.argv[1] == "i love you"):
-    print("0")
-else:
-    print(out)
 
+@app.route('/')
+def init():
+    return render_template("index.html")
+@app.route('/send',methods=['GET','POST'])
+def send():
+    em="😀";
+    sen=request.form['sen']
+    x_test = np.array([sen])
+    X_test_indices = sentences_to_indices(x_test, word_to_index, maxLen)
+    print(X_test_indices)
+    print(str(maxLen))
+    out = np.argmax(model1.predict(X_test_indices))
+    print(out)
+    if out == 0:
+        em="❤️"
+    elif out==1:
+        em="⚾"
+    elif out==2:
+        em="😀"
+    elif out==3:
+         em="😞"
+    elif out==4:
+        em="🍴"
+    elif out==5:
+         em="👍🏻"
+    sen = sen +  em
+    return render_template('result.html',sen=sen)
+if __name__ == '__main__':
+    app.run(host='127.0.0.1',port=8080)
